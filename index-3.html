@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mon bénéfice</title>
+<meta name="application-name" content="Mon bénéfice">
+<meta name="apple-mobile-web-app-title" content="Mon bénéfice">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#022210">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#0a1a12;--card:#12281c;--line:#24402f;--txt:#f1f5f2;--mut:#9db3a5;--gold:#f5b800;--bad:#ff8a80;--ok:#6fdc8c;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--txt);font:16px/1.45 system-ui,Roboto,Arial,sans-serif;padding:env(safe-area-inset-top) 0 calc(76px + env(safe-area-inset-bottom))}
+header{background:#022210;border-bottom:4px solid var(--gold);padding:14px 16px}
+header b{color:var(--gold)}
+header h1{font-size:19px;margin:6px 0 0}
+main{padding:16px;max-width:640px;margin:auto}
+.note{border-left:5px solid var(--gold);background:var(--card);border-radius:10px;padding:12px 14px;margin-bottom:18px}
+h2{font-size:22px;margin:6px 0 4px}
+.sub{color:var(--mut);margin:0 0 14px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end;margin-bottom:12px}
+.row.one{grid-template-columns:1fr}
+.f{display:flex;flex-direction:column;justify-content:flex-end;min-width:0}
+label{font-size:14px;color:var(--mut);margin-bottom:5px;line-height:1.25}
+.h{font-size:12px;color:var(--mut);margin-top:4px;opacity:.85}
+input,select{width:100%;height:46px;background:#0c1d14;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit}
+input:focus,select:focus{outline:2px solid var(--gold)}
+.btn{width:100%;background:var(--gold);color:#1a1400;border:0;border-radius:14px;padding:14px;font:700 17px system-ui;margin-bottom:14px}
+.del{background:none;border:0;color:var(--bad);font:inherit;padding:6px 0}
+.calc{border-top:1px dashed var(--line);margin-top:4px;padding-top:10px;color:var(--mut);font-size:14px}
+.tbl{width:100%;border-collapse:collapse}
+.tbl td{padding:8px 0;border-bottom:1px solid var(--line)}
+.tbl td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.tbl tr.t td{border:0;font-size:18px;color:var(--gold)}
+.msg{border:2px solid;border-radius:12px;padding:12px 14px;font-weight:600;margin:14px 0}
+.good{border-color:var(--ok);color:var(--ok)}.bad{border-color:var(--bad);color:var(--bad)}.info{border-color:var(--gold);color:var(--gold)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:#0a2517;border-top:4px solid var(--gold);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;color:var(--txt);font:15px system-ui;padding:16px 2px}
+nav button.on{background:var(--gold);color:#1a1400;font-weight:700}
+section{display:none}section.on{display:block}
+small{color:var(--mut)}
+</style>
+</head>
+<body>
+<header><div><b>Sika Skills</b> · Calculer le vrai bénéfice</div><h1>Mon bénéfice : mon vérificateur</h1></header>
+<main>
+<div class="note">Fais d’abord tes calculs à la main dans ton cahier, comme dans le guide. Remplis ensuite ici pour vérifier : l’application calcule seule et te dit si ton résultat est juste.</div>
+
+<section id="p0" class="on">
+<h2>Mes ventes</h2><p class="sub">Outils 1 et 2 · Une carte par vente. Si un client te rend un article, choisis « Retour ».</p>
+<div id="sales"></div><button class="btn" data-add="sales">+ Ajouter une vente</button>
+<div class="card"><table class="tbl" id="salesSum"></table></div>
+</section>
+
+<section id="p1">
+<h2>Mon stock et le coût des marchandises</h2><p class="sub">Outils 3 et 4 · Compte tes articles le 1er du mois et le dernier jour du mois.</p>
+<div id="stock"></div><button class="btn" data-add="stock">+ Ajouter un article</button>
+<div class="card">
+<div class="row one"><div class="f"><label>Total payé pour acheter de nouvelles marchandises ce mois-ci (FCFA)</label><input data-s="achats" inputmode="numeric" type="number" min="0"><div class="h">Compte le prix payé au fournisseur + le transport pour ramener les marchandises. Exemple : 10 robes à 5 000 + 5 000 de transport = 55 000.</div></div></div>
+<div class="row one"><div class="f"><label>Marchandises que j’ai prises pour moi ou ma famille (FCFA)</label><input data-s="pris" inputmode="numeric" type="number" min="0"><div class="h">Compte-les à leur prix d’achat. Laisse vide si tu n’en as pas pris.</div></div></div>
+</div>
+<div class="card"><table class="tbl" id="stockSum"></table></div>
+</section>
+
+<section id="p2">
+<h2>Mes dépenses</h2><p class="sub">Outils 5 à 7 · Pose-toi la question : « Cette dépense existerait-elle si je fermais mon commerce ? » Si oui, choisis « Perso ».</p>
+<div class="note">Ne note pas ici l’achat de marchandises : il est déjà dans le coût des marchandises vendues.</div>
+<div id="dep"></div><button class="btn" data-add="dep">+ Ajouter une dépense</button>
+<div class="card"><table class="tbl" id="depSum"></table></div>
+</section>
+
+<section id="p3">
+<h2>Mon bénéfice du mois</h2><p class="sub">Outils 8 à 10 · Les chiffres viennent des autres pages.</p>
+<div class="card"><table class="tbl" id="benTab"></table></div>
+<div id="benMsg"></div>
+<div class="card"><table class="tbl" id="cmpTab"></table></div>
+<h2>Je compare avec mon calcul à la main</h2>
+<div class="card"><div class="row one"><div class="f"><label>Mon bénéfice calculé à la main (FCFA)</label><input data-s="hand" inputmode="numeric" type="number"></div></div><div id="handMsg"></div></div>
+</section>
+
+<section id="p4">
+<h2>Mon suivi mois par mois</h2><p class="sub">Outil 12 · Enregistre le mois quand tes calculs sont terminés.</p>
+<div class="card"><div class="row one"><div class="f"><label>Nom du mois (exemple : Octobre 2026)</label><input data-s="mname" type="text"></div></div></div>
+<button class="btn" id="saveM">Enregistrer ce mois dans mon suivi</button>
+<div id="months"></div>
+<h2>L’article le plus rentable</h2><p class="sub">Outil 13 · Prix de vente moins prix d’achat = ce que chaque article te laisse. Regarde aussi s’il se vend vite.</p>
+<div id="best"></div><button class="btn" data-add="best">+ Ajouter un article</button>
+<h2>Ma routine de gestion</h2><p class="sub">Outil 11 · Choisis ton jour et ton heure.</p>
+<div class="card">
+<div class="row one"><div class="f"><label>Chaque jour : je note mes ventes, dépenses, prélèvements et restes dus. Quand ?</label><input data-r="d" type="text" placeholder="ex. tous les soirs à 19 h"></div></div>
+<div class="row one"><div class="f"><label>Chaque semaine : je relance les clients et je regarde mon stock. Quand ?</label><input data-r="w" type="text" placeholder="ex. samedi à 18 h"></div></div>
+<div class="row one"><div class="f"><label>Chaque mois : je compte mon stock et je calcule mon bénéfice. Quand ?</label><input data-r="m" type="text" placeholder="ex. le dernier jour du mois"></div></div>
+</div>
+<p class="sub">Tes données restent sur ton téléphone.</p>
+<button class="del" id="wipe">Tout effacer</button>
+</section>
+</main>
+<nav id="nav"></nav>
+
+<script>
+var KEY="sika_verif_v2",S={sales:[],stock:[],dep:[],best:[],months:[],achats:"",pris:"",hand:"",mname:"",r:{d:"",w:"",m:""}};
+try{var o=JSON.parse(localStorage.getItem(KEY));if(o)S=Object.assign(S,o)}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+var N=function(v){v=parseFloat(v);return isNaN(v)?0:v},F=function(n){return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,"\u202f")+" FCFA"};
+var $=function(i){return document.getElementById(i)};
+function fld(l,k,i,v,o){o=o||{};return '<div class="f"><label>'+l+'</label><input data-l="'+o.l+'" data-i="'+i+'" data-k="'+k+'" type="'+(o.t||"number")+'" '+(o.t?'':'inputmode="numeric" ')+'value="'+(v==null?"":String(v).replace(/"/g,"&quot;"))+'"'+(o.p?' placeholder="'+o.p+'"':'')+'></div>'}
+function sel(l,k,i,v,opts,ln){return '<div class="f"><label>'+l+'</label><select data-l="'+ln+'" data-i="'+i+'" data-k="'+k+'">'+opts.map(function(x){return '<option'+(x==v?' selected':'')+'>'+x+'</option>'}).join("")+'</select></div>'}
+function del(l,i){return '<button class="del" data-del="'+l+'" data-i="'+i+'">Supprimer cette ligne</button>'}
+var T={t:"text"};
+function draw(){
+ $("sales").innerHTML=S.sales.map(function(s,i){return '<div class="card"><div class="row">'+fld("Jour du mois","jour",i,s.jour,{l:"sales",p:"ex. 3"})+sel("Type","type",i,s.type||"Vente",["Vente","Retour"],"sales")+'</div><div class="row one">'+fld("Article","art",i,s.art,{l:"sales",t:"text"})+'</div><div class="row">'+fld("Quantité","qte",i,s.qte,{l:"sales"})+fld("Prix unitaire (FCFA)","prix",i,s.prix,{l:"sales"})+'</div><div class="row">'+fld("Réduction accordée (FCFA)","red",i,s.red,{l:"sales"})+fld("Argent reçu (FCFA)","recu",i,s.recu,{l:"sales"})+'</div><div class="calc" id="sc'+i+'"></div>'+del("sales",i)+'</div>'}).join("");
+ $("stock").innerHTML=S.stock.map(function(s,i){return '<div class="card"><div class="row one">'+fld("Article","art",i,s.art,{l:"stock",t:"text"})+'</div><div class="row one">'+fld("Coût d’achat d’une pièce (FCFA)","cout",i,s.cout,{l:"stock"})+'</div><div class="row">'+fld("Combien j’en avais au 1er du mois","qd",i,s.qd,{l:"stock"})+fld("Combien il m’en reste à la fin du mois","qf",i,s.qf,{l:"stock"})+'</div><div class="calc" id="tc'+i+'"></div>'+del("stock",i)+'</div>'}).join("");
+ $("dep").innerHTML=S.dep.map(function(s,i){return '<div class="card"><div class="row">'+fld("Jour du mois","jour",i,s.jour,{l:"dep",p:"ex. 8"})+sel("Pro ou perso","pp",i,s.pp||"Pro",["Pro","Perso"],"dep")+'</div><div class="row one">'+fld("Motif (exemple : loyer, taxi, crédit)","motif",i,s.motif,{l:"dep",t:"text"})+'</div><div class="row one">'+fld("Montant (FCFA)","mt",i,s.mt,{l:"dep"})+'</div>'+del("dep",i)+'</div>'}).join("");
+ $("best").innerHTML=S.best.map(function(s,i){return '<div class="card"><div class="row one">'+fld("Article","art",i,s.art,{l:"best",t:"text"})+'</div><div class="row">'+fld("Prix de vente (FCFA)","pv",i,s.pv,{l:"best"})+fld("Prix d’achat (FCFA)","pa",i,s.pa,{l:"best"})+'</div><div class="calc" id="bc'+i+'"></div>'+del("best",i)+'</div>'}).join("");
+ document.querySelectorAll("[data-s]").forEach(function(e){e.value=S[e.dataset.s]||""});
+ document.querySelectorAll("[data-r]").forEach(function(e){e.value=S.r[e.dataset.r]||""});
+ months();upd()}
+function months(){$("months").innerHTML=S.months.length?'<div class="card"><table class="tbl">'+S.months.map(function(m,i){return '<tr><td>'+m.n+'<br><small>Bénéfice</small></td><td>'+F(m.b)+'<br><small>Prélèvements '+F(m.p)+'</small></td></tr>'}).join("")+'</table></div>':""}
+function row(a,b,c){return '<tr'+(c?' class="'+c+'"':'')+'><td>'+a+'</td><td>'+b+'</td></tr>'}
+function calc(){
+ var r={normal:0,red:0,ret:0,recu:0,reste:0};
+ S.sales.forEach(function(s){var v=N(s.qte)*N(s.prix);if(s.type=="Retour"){r.ret+=v;r.recu-=v}else{r.normal+=v;r.red+=N(s.red);r.recu+=N(s.recu);r.reste+=v-N(s.red)-N(s.recu)}});
+ r.ca=r.normal-r.red-r.ret;
+ r.vd=0;r.vf=0;S.stock.forEach(function(s){r.vd+=N(s.cout)*N(s.qd);r.vf+=N(s.cout)*N(s.qf)});
+ r.cmv=r.vd+N(S.achats)-r.vf-N(S.pris);
+ r.dep=0;r.perso=0;S.dep.forEach(function(s){s.pp=="Perso"?r.perso+=N(s.mt):r.dep+=N(s.mt)});
+ r.marge=r.ca-r.cmv;r.ben=r.marge-r.dep;r.prel=r.perso+N(S.pris);return r}
+function upd(){
+ var r=calc();
+ S.sales.forEach(function(s,i){var e=$("sc"+i);if(e){var v=N(s.qte)*N(s.prix);e.textContent=s.type=="Retour"?"Remboursé : "+F(v):"Vente nette : "+F(v-N(s.red))+" · Reste dû : "+F(v-N(s.red)-N(s.recu))}});
+ S.stock.forEach(function(s,i){var e=$("tc"+i);if(e)e.textContent="Valeur au début : "+F(N(s.cout)*N(s.qd))+" · Valeur à la fin : "+F(N(s.cout)*N(s.qf))});
+ S.best.forEach(function(s,i){var e=$("bc"+i);if(e)e.textContent="Il te laisse "+F(N(s.pv)-N(s.pa))+" par pièce vendue"});
+ $("salesSum").innerHTML=row("Ventes au prix normal",F(r.normal))+row("− Réductions",F(r.red))+row("− Retours remboursés",F(r.ret))+row("= Chiffre d’affaires net",F(r.ca),"t")+row("− Restes dus",F(r.reste))+row("= Argent encaissé",F(r.recu));
+ $("stockSum").innerHTML=row("Valeur du stock au début",F(r.vd))+row("+ Achats du mois",F(N(S.achats)))+row("− Valeur du stock à la fin",F(r.vf))+row("− Pris pour moi",F(N(S.pris)))+row("= Coût des marchandises vendues",F(r.cmv),"t");
+ $("depSum").innerHTML=row("Dépenses de fonctionnement (Pro)",F(r.dep),"t")+row("Prélèvements personnels (Perso)",F(r.perso));
+ $("benTab").innerHTML=row("Chiffre d’affaires net",F(r.ca))+row("− Coût des marchandises vendues",F(r.cmv))+row("= Marge commerciale",F(r.marge))+row("− Dépenses de fonctionnement",F(r.dep))+row("= Bénéfice du mois",F(r.ben),"t");
+ $("benMsg").innerHTML=r.ca==0&&r.dep==0?'<div class="msg info">Remplis les pages Ventes, Stock et Dépenses pour voir ton bénéfice.</div>':r.ben<0?'<div class="msg bad">Perte ce mois-ci : ton commerce a perdu '+F(-r.ben)+'. Regarde d’abord ta marge commerciale, puis tes dépenses.</div>':'<div class="msg good">Bénéfice ce mois-ci : '+F(r.ben)+'.</div>';
+ $("cmpTab").innerHTML=row("Mon bénéfice",F(r.ben))+row("− Mes prélèvements (argent + articles pris)",F(r.prel))+row("= Ce qu’il me reste",F(r.ben-r.prel),"t")+row("Bénéfice pour 100 FCFA vendus",r.ca>0?(Math.round(r.ben/r.ca*1000)/10)+" FCFA":"—")+row("Ne prélève pas plus que ton bénéfice","");
+ var h=$("handMsg");if(S.hand===""){h.innerHTML=""}else{var d=N(S.hand)-Math.round(r.ben);h.innerHTML=d==0?'<div class="msg good">Bravo, ton calcul à la main est juste.</div>':'<div class="msg bad">Ton calcul à la main s’écarte de '+F(Math.abs(d))+' ('+(d>0?"trop haut":"trop bas")+'). Reprends les étapes du guide pour trouver l’erreur.</div>'}
+}
+document.addEventListener("input",function(e){var t=e.target;
+ if(t.dataset.l){S[t.dataset.l][t.dataset.i][t.dataset.k]=t.value}
+ else if(t.dataset.s){S[t.dataset.s]=t.value}else if(t.dataset.r){S.r[t.dataset.r]=t.value}else return;
+ save();upd()});
+document.addEventListener("click",function(e){var t=e.target;
+ if(t.dataset.add){S[t.dataset.add].push({});save();draw()}
+ if(t.dataset.del){S[t.dataset.del].splice(t.dataset.i,1);save();draw()}});
+$("saveM").onclick=function(){var r=calc();S.months.push({n:S.mname||"Mois "+(S.months.length+1),b:Math.round(r.ben),p:Math.round(r.prel)});S.mname="";save();draw()};
+$("wipe").onclick=function(){if(confirm("Tout effacer ? Cette action est définitive.")){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}};
+var names=["Ventes","Stock","Dépenses","Bénéfice","Suivi"];
+$("nav").innerHTML=names.map(function(n,i){return '<button data-tab="'+i+'"'+(i?'':' class="on"')+'>'+n+'</button>'}).join("");
+$("nav").onclick=function(e){var i=e.target.dataset.tab;if(i==null)return;document.querySelectorAll("section").forEach(function(s,k){s.classList.toggle("on",k==i)});document.querySelectorAll("nav button").forEach(function(b,k){b.classList.toggle("on",k==i)});scrollTo(0,0)};
+draw();
+</script>
+</body>
+</html>
